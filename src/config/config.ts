@@ -1,4 +1,5 @@
 import type { AppConfig } from './types';
+import siteConfig from '../../site.config';
 
 /**
  * 应用配置文件
@@ -7,8 +8,8 @@ import type { AppConfig } from './types';
 const config: AppConfig = {
   // ===== 基础配置 =====
 
-  // 网站地址（用于 SEO）
-  siteUrl: 'https://lyhxx.github.io/uptime-status',
+  // 网站地址（用于 SEO，从 site.config.ts 读取）
+  siteUrl: siteConfig.siteUrl,
 
   // 网站标题
   siteName: '服务状态监控面板',

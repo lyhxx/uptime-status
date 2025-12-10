@@ -24,8 +24,8 @@
 ### GitHub Pages 部署
 
 1. Fork 本项目
-2. 修改 `src/config/config.ts` 配置文件
-3. 修改 `vite.config.ts` 中的 `base` 为你的仓库名
+2. 修改 `site.config.ts` 中的 `base` 和 `siteUrl`
+3. 修改 `src/config/config.ts` 中的其他配置
 4. 推送代码，GitHub Actions 会自动构建部署
 5. 在仓库 Settings → Pages 中启用 GitHub Pages，Source 选择 "GitHub Actions"
 
@@ -55,13 +55,24 @@ npm run build
 
 ## 配置说明
 
-编辑 `src/config/config.ts` 文件：
+### 站点配置 (site.config.ts)
+
+```typescript
+export default {
+  // 网站部署路径
+  // GitHub Pages 子路径部署时填仓库名，如 '/uptime-status/'
+  // 使用自定义域名或根路径部署时填 '/'
+  base: '/uptime-status/',
+
+  // 网站地址（用于 SEO）
+  siteUrl: 'https://lyhxx.github.io/uptime-status',
+};
+```
+
+### 应用配置 (src/config/config.ts)
 
 ```typescript
 const config: AppConfig = {
-  // 网站地址（用于 SEO）
-  siteUrl: 'https://lyhxx.github.io/uptime-status',
-
   // 网站标题
   siteName: '服务状态监控面板',
 
@@ -158,6 +169,14 @@ location /api/uptimerobot/ {
 - [TanStack Query](https://tanstack.com/query) - 数据请求
 - [Zustand](https://zustand-demo.pmnd.rs/) - 状态管理
 - [Recharts](https://recharts.org/) - 图表库
+
+## 自定义域名（可选）
+
+如果想使用自定义域名访问：
+
+1. 在 DNS 添加 CNAME 记录，指向 `<username>.github.io`
+2. 在仓库 Settings → Pages → Custom domain 填入你的域名
+3. 修改 `site.config.ts` 中的 `base` 为 `/`，`siteUrl` 为你的域名
 
 ## 常见问题
 
