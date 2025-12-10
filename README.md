@@ -4,6 +4,8 @@
 
 演示地址：https://lyhxx.github.io/uptime-status
 
+![预览图](docs/images/perview.png)
+
 ## 特性
 
 - 🚀 **现代技术栈** - Vite + React 18 + TypeScript + TailwindCSS
@@ -39,6 +41,17 @@ npm run dev
 # 构建生产版本
 npm run build
 ```
+
+## 获取 API Key
+
+1. 注册 [UptimeRobot](https://uptimerobot.com/) 账号
+2. 添加需要监控的网站/服务
+3. 进入 **My Settings** 页面
+4. 找到 **API Settings** 部分
+5. 点击 **Create Read-only API Key** 创建只读 API Key
+6. 复制生成的 Key（以 `ur` 开头）
+
+> 注意：请使用 Read-only API Key，不要使用 Main API Key，避免泄露后被恶意操作。
 
 ## 配置说明
 
@@ -100,18 +113,41 @@ const config: AppConfig = {
 
 ## API 代理
 
-项目包含 Cloudflare Worker 代理脚本 `worker/uptimerobot-proxy.js`，可部署到 Cloudflare Workers 解决跨域问题。
+由于浏览器跨域限制，直接调用 UptimeRobot API 会失败，需要通过代理转发请求。
 
-也可以使用 Nginx 代理：
+### Nginx 代理（推荐）
 
 ```nginx
+# UptimeRobot API 代理
 location /api/uptimerobot/ {
-  proxy_ssl_server_name on;
   proxy_pass https://api.uptimerobot.com/;
+  proxy_ssl_server_name on;
+
+  # 隐藏上游返回的 CORS header
   proxy_hide_header Access-Control-Allow-Origin;
+  proxy_hide_header Access-Control-Allow-Methods;
+  proxy_hide_header Access-Control-Allow-Headers;
+
+  # 重新添加
   add_header Access-Control-Allow-Origin * always;
+  add_header Access-Control-Allow-Methods 'GET, POST, OPTIONS' always;
+  add_header Access-Control-Allow-Headers 'Content-Type' always;
+
+  if ($request_method = 'OPTIONS') {
+    return 204;
+  }
 }
 ```
+
+### Cloudflare Worker
+
+如果没有自己的服务器，可以使用 Cloudflare Worker：
+
+1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. 进入 Workers & Pages → Create Worker
+3. 将 `worker/uptimerobot-proxy.js` 的内容粘贴进去
+4. 部署后获得 Worker URL（如 `https://your-worker.workers.dev`）
+5. 在配置文件中设置 `apiUrl: 'https://your-worker.workers.dev/v2/getMonitors'`
 
 ## 技术栈
 
@@ -122,6 +158,24 @@ location /api/uptimerobot/ {
 - [TanStack Query](https://tanstack.com/query) - 数据请求
 - [Zustand](https://zustand-demo.pmnd.rs/) - 状态管理
 - [Recharts](https://recharts.org/) - 图表库
+
+## 常见问题
+
+**Q: 页面显示"获取数据失败"？**
+
+A: 通常是跨域问题，需要配置 API 代理。参考上方 API 代理部分。
+
+**Q: 数据不更新？**
+
+A: 默认 5 分钟刷新一次，可在配置文件中调整 `refetchInterval`。UptimeRobot 免费版本身也是 5 分钟检测一次。
+
+**Q: 如何监控多个账号的服务？**
+
+A: 在 `apiKeys` 数组中添加多个 API Key，数据会自动合并显示。
+
+**Q: 如何隐藏某些监控项？**
+
+A: 在 UptimeRobot 后台为特定监控项创建 Monitor-Specific API Key，只会返回该监控项的数据。
 
 ## License
 

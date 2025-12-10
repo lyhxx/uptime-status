@@ -1,0 +1,34 @@
+name: 创建 Release
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 生成版本号
+        id: version
+        run: |
+          # 基于日期和提交数生成版本号
+          DATE=$(date +'%Y.%m.%d')
+          COUNT=$(git rev-list --count HEAD)
+          echo "version=v${DATE}.${COUNT}" >> $GITHUB_OUTPUT
+
+      - name: 创建 Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          generate_release_notes: true
