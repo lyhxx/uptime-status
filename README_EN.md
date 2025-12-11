@@ -11,13 +11,13 @@ Demo: https://lyhxx.github.io/uptime-status
 ## Features
 
 - 🚀 **Modern Tech Stack** - Vite + React 18 + TypeScript + TailwindCSS
-- 📊 **Data Visualization** - Uptime trend charts, response time graphs (dynamic Y-axis)
+- 📊 **Data Visualization** - Uptime trend charts, response time graphs (dynamic Y-axis, theme-adaptive tooltips)
 - 🔔 **Real-time Notifications** - Browser notifications (toggleable), page title status
 - 🌓 **Theme Switching** - Dark/Light/System modes
 - 📱 **Responsive Design** - Perfect mobile adaptation
 - 🔍 **Search & Filter** - Search by name, filter by status (including paused), multiple sorting options
 - 📅 **Time Range** - Support 30/60/90 days
-- 📋 **Incident History** - Recent incidents with reasons
+- 📋 **Incident History** - Recent incidents with reasons (responsive layout)
 - 🖼️ **Embed Mode** - Support iframe embedding
 - 📲 **PWA Support** - Add to home screen
 - 🔤 **Font Adaptation** - Auto-adapt to platform fonts

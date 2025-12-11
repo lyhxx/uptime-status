@@ -6,6 +6,29 @@ interface MonitorDetailProps {
   monitor: ProcessedMonitor;
 }
 
+// 自定义 Tooltip 组件
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+  valueFormatter: (value: number) => string;
+  labelText: string;
+  color: string;
+}
+
+function CustomTooltip({ active, payload, label, valueFormatter, labelText, color }: CustomTooltipProps) {
+  if (!active || !payload?.length) return null;
+  
+  return (
+    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg px-3 py-2">
+      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{label}</p>
+      <p className="text-sm font-medium" style={{ color }}>
+        {labelText}：{valueFormatter(payload[0].value)}
+      </p>
+    </div>
+  );
+}
+
 export function MonitorDetail({ monitor }: MonitorDetailProps) {
   // 可用率趋势数据
   const uptimeData = [...monitor.daily].reverse().map((d) => ({
@@ -51,13 +74,13 @@ export function MonitorDetail({ monitor }: MonitorDetailProps) {
                   width={35}
                 />
                 <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1e293b', 
-                    border: 'none',
-                    borderRadius: '8px',
-                    color: '#fff'
-                  }}
-                  formatter={(value: number) => [`${value}%`, '可用率']}
+                  content={
+                    <CustomTooltip 
+                      valueFormatter={(v) => `${v}%`}
+                      labelText="可用率"
+                      color="#22c55e"
+                    />
+                  }
                 />
                 <Line 
                   type="monotone" 
@@ -97,13 +120,13 @@ export function MonitorDetail({ monitor }: MonitorDetailProps) {
                     tickFormatter={(v) => `${v}ms`}
                   />
                   <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1e293b', 
-                      border: 'none',
-                      borderRadius: '8px',
-                      color: '#fff'
-                    }}
-                    formatter={(value: number) => [`${value}ms`, '响应时间']}
+                    content={
+                      <CustomTooltip 
+                        valueFormatter={(v) => `${v}ms`}
+                        labelText="响应时间"
+                        color="#3b82f6"
+                      />
+                    }
                   />
                   <Line 
                     type="monotone" 
@@ -131,23 +154,29 @@ export function MonitorDetail({ monitor }: MonitorDetailProps) {
                 key={idx}
                 className="text-sm py-2 border-b border-slate-100 dark:border-slate-700 last:border-0"
               >
-                {/* 第一行：时间 */}
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-red-500 flex-shrink-0">●</span>
-                  <span className="text-slate-600 dark:text-slate-400">
-                    {formatDate(log.datetime)}
-                  </span>
-                  <span className="text-slate-400 text-xs">
-                    ({formatRelativeTime(log.datetime)})
+                {/* 时间行 */}
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-red-500 flex-shrink-0">●</span>
+                    <span className="text-slate-600 dark:text-slate-400 truncate">
+                      {formatDate(log.datetime)}
+                    </span>
+                    <span className="text-slate-400 text-xs whitespace-nowrap">
+                      ({formatRelativeTime(log.datetime)})
+                    </span>
+                  </div>
+                  {/* PC端：持续时间在右边 */}
+                  <span className="hidden sm:block text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                    {formatDuration(log.duration)}
                   </span>
                 </div>
-                {/* 第二行：持续时间 */}
-                <div className="ml-4 text-xs text-slate-500 dark:text-slate-400">
+                {/* 移动端：持续时间在下面 */}
+                <div className="sm:hidden ml-4 text-xs text-slate-500 dark:text-slate-400">
                   持续 {formatDuration(log.duration)}
                 </div>
-                {/* 第三行：原因 */}
+                {/* 原因 */}
                 {log.reason?.detail && (
-                  <p className="mt-1 ml-4 text-xs text-red-400">
+                  <p className="ml-4 text-xs text-red-400">
                     原因：{log.reason.detail}
                   </p>
                 )}
