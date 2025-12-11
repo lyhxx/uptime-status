@@ -33,16 +33,16 @@ export function IncidentList({ incidents, isLoading }: IncidentListProps) {
   }
 
   return (
-    <div className="card overflow-hidden">
+    <section className="card overflow-hidden" aria-labelledby="incidents-heading">
       <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
-        <h3 className="font-medium text-slate-900 dark:text-white">
+        <h2 id="incidents-heading" className="font-medium text-slate-900 dark:text-white">
           最近故障事件
-        </h3>
-        <span className="text-xs text-slate-400">{incidents.length} 条</span>
+        </h2>
+        <span className="text-xs text-slate-400" aria-label={`共 ${incidents.length} 条故障记录`}>{incidents.length} 条</span>
       </div>
-      <div className="divide-y divide-slate-100 dark:divide-slate-700 max-h-[400px] overflow-y-auto">
+      <ul className="divide-y divide-slate-100 dark:divide-slate-700 max-h-[400px] overflow-y-auto" role="list">
         {incidents.map((incident) => (
-          <div 
+          <li 
             key={incident.id} 
             className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
           >
@@ -69,14 +69,14 @@ export function IncidentList({ incidents, isLoading }: IncidentListProps) {
                 </span>
               )}
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
       {incidents.length >= 20 && (
         <div className="p-2 text-center text-xs text-slate-400 border-t border-slate-100 dark:border-slate-700">
           仅显示最近 20 条
         </div>
       )}
-    </div>
+    </section>
   );
 }

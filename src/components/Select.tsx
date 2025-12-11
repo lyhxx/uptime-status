@@ -10,9 +10,10 @@ interface SelectProps {
   options: Option[];
   onChange: (value: string | number) => void;
   className?: string;
+  'aria-label'?: string;
 }
 
-export function Select({ value, options, onChange, className = '' }: SelectProps) {
+export function Select({ value, options, onChange, className = '', 'aria-label': ariaLabel }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -33,7 +34,10 @@ export function Select({ value, options, onChange, className = '' }: SelectProps
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between gap-2 px-3 py-2 min-w-[100px]
+        aria-label={ariaLabel}
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        className="flex items-center justify-between gap-2 px-3 py-2 min-w-[90px]
                    bg-white dark:bg-slate-800 
                    border border-slate-200 dark:border-slate-700 
                    rounded-lg text-sm text-slate-700 dark:text-slate-200
@@ -41,26 +45,33 @@ export function Select({ value, options, onChange, className = '' }: SelectProps
                    focus:outline-none focus:ring-2 focus:ring-green-500/50
                    transition-colors"
       >
-        <span>{selectedOption?.label}</span>
+        <span className="truncate">{selectedOption?.label}</span>
         <svg 
-          className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
           fill="none" 
           viewBox="0 0 24 24" 
           stroke="currentColor"
+          aria-hidden="true"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full min-w-[120px]
-                        bg-white dark:bg-slate-800 
-                        border border-slate-200 dark:border-slate-700 
-                        rounded-lg shadow-lg overflow-hidden">
+        <div 
+          className="absolute z-50 mt-1 w-full min-w-[120px]
+                      bg-white dark:bg-slate-800 
+                      border border-slate-200 dark:border-slate-700 
+                      rounded-lg shadow-lg overflow-hidden"
+          role="listbox"
+          aria-label={ariaLabel}
+        >
           {options.map((option) => (
             <button
               key={option.value}
               type="button"
+              role="option"
+              aria-selected={option.value === value}
               onClick={() => {
                 onChange(option.value);
                 setIsOpen(false);

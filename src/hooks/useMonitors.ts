@@ -28,8 +28,17 @@ export function useMonitors() {
   });
 
   const isLoading = queries.some((q) => q.isLoading);
+  const isFetching = queries.some((q) => q.isFetching);
   const isError = queries.some((q) => q.isError);
   const error = queries.find((q) => q.error)?.error;
+  
+  // 获取最后更新时间
+  const lastUpdated = useMemo(() => {
+    const times = queries
+      .map((q) => q.dataUpdatedAt)
+      .filter((t) => t > 0);
+    return times.length > 0 ? Math.max(...times) : null;
+  }, [queries]);
 
   const allMonitors = useMemo(() => {
     return queries.flatMap((q) => q.data || []);
@@ -124,10 +133,12 @@ export function useMonitors() {
     monitors: filteredMonitors,
     allMonitors,
     isLoading,
+    isFetching,
     isError,
     error,
     stats,
     incidents,
+    lastUpdated,
     refetch,
   };
 }

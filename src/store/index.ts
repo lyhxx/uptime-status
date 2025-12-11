@@ -9,20 +9,20 @@ interface AppState {
   countDays: number;
   setCountDays: (days: number) => void;
 
-  statusFilter: 'all' | 'ok' | 'down';
-  setStatusFilter: (filter: 'all' | 'ok' | 'down') => void;
+  statusFilter: 'all' | 'ok' | 'down' | 'paused';
+  setStatusFilter: (filter: 'all' | 'ok' | 'down' | 'paused') => void;
 
   sortBy: 'name' | 'status' | 'uptime';
   setSortBy: (sort: 'name' | 'status' | 'uptime') => void;
-
-  expandedMonitors: Set<number>;
-  toggleExpanded: (id: number) => void;
 
   searchQuery: string;
   setSearchQuery: (query: string) => void;
 
   embedMode: boolean;
   setEmbedMode: (mode: boolean) => void;
+
+  notificationEnabled: boolean;
+  setNotificationEnabled: (enabled: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -42,29 +42,21 @@ export const useAppStore = create<AppState>()(
         sortBy: config.defaultSort,
         setSortBy: (sortBy) => set({ sortBy }),
 
-        expandedMonitors: new Set(),
-        toggleExpanded: (id) => {
-          const expanded = new Set(get().expandedMonitors);
-          if (expanded.has(id)) {
-            expanded.delete(id);
-          } else {
-            expanded.add(id);
-          }
-          set({ expandedMonitors: expanded });
-        },
-
         searchQuery: '',
         setSearchQuery: (searchQuery) => set({ searchQuery }),
 
         embedMode: false,
         setEmbedMode: (embedMode) => set({ embedMode }),
+
+        notificationEnabled: true,
+        setNotificationEnabled: (notificationEnabled) => set({ notificationEnabled }),
       };
     },
     {
       name: 'uptime-status-storage',
       partialize: (state) => ({
         theme: state.theme,
-        // countDays 不持久化，每次使用配置文件的值
+        notificationEnabled: state.notificationEnabled,
       }),
     }
   )

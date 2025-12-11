@@ -20,18 +20,27 @@ export function MonitorCard({ monitor, showLink }: MonitorCardProps) {
   const countDays = useAppStore((s) => s.countDays);
 
   return (
-    <div className="border-b border-slate-100 dark:border-slate-700 last:border-b-0">
+    <article className="border-b border-slate-100 dark:border-slate-700 last:border-b-0">
       <div 
         className="p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
         onClick={() => setExpanded(!expanded)}
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded}
+        aria-label={`${monitor.name} - ${getStatusText(monitor.status)}，点击${expanded ? '收起' : '展开'}详情`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setExpanded(!expanded);
+          }
+        }}
       >
         {/* 头部信息 */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span 
-              className="font-medium text-slate-900 dark:text-white"
-              dangerouslySetInnerHTML={{ __html: monitor.name }}
-            />
+            <span className="font-medium text-slate-900 dark:text-white">
+              {monitor.name}
+            </span>
             {showLink && (
               <a
                 href={monitor.url}
@@ -39,8 +48,9 @@ export function MonitorCard({ monitor, showLink }: MonitorCardProps) {
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
                 className="text-slate-400 hover:text-green-500 transition-colors"
+                aria-label={`访问 ${monitor.name} 网站`}
               >
-                🔗
+                <span aria-hidden="true">🔗</span>
               </a>
             )}
           </div>
@@ -48,6 +58,8 @@ export function MonitorCard({ monitor, showLink }: MonitorCardProps) {
             <span className={`text-sm font-medium ${getStatusColor(monitor.status)}`}>
               {monitor.status === 'ok' && <span className="inline-block animate-pulse">●</span>}
               {monitor.status === 'down' && <span>●</span>}
+              {monitor.status === 'paused' && <span>●</span>}
+              {monitor.status === 'unknown' && <span>●</span>}
               {' '}{getStatusText(monitor.status)}
             </span>
             <span className="text-slate-400 text-sm">
@@ -93,6 +105,6 @@ export function MonitorCard({ monitor, showLink }: MonitorCardProps) {
 
       {/* 展开详情 */}
       {expanded && <MonitorDetail monitor={monitor} />}
-    </div>
+    </article>
   );
 }

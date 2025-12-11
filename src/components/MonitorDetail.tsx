@@ -13,6 +13,10 @@ export function MonitorDetail({ monitor }: MonitorDetailProps) {
     uptime: d.uptime,
   }));
 
+  // 动态计算 Y 轴范围
+  const minUptime = Math.min(...uptimeData.map((d) => d.uptime));
+  const yAxisMin = Math.max(0, Math.floor(minUptime / 5) * 5 - 5); // 向下取整到5的倍数，再减5
+
   // 响应时间数据
   const responseData = monitor.responseTimes?.map((rt) => ({
     time: new Date(rt.datetime * 1000).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
@@ -41,7 +45,7 @@ export function MonitorDetail({ monitor }: MonitorDetailProps) {
                   interval="preserveStartEnd"
                 />
                 <YAxis 
-                  domain={[95, 100]} 
+                  domain={[yAxisMin, 100]} 
                   tick={{ fontSize: 10 }} 
                   stroke="#94a3b8"
                   width={35}
@@ -121,14 +125,15 @@ export function MonitorDetail({ monitor }: MonitorDetailProps) {
           <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
             故障历史 ({downLogs.length} 次)
           </h4>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
+          <div className="space-y-3 max-h-48 overflow-y-auto">
             {downLogs.slice(0, 10).map((log, idx) => (
               <div 
                 key={idx}
-                className="flex items-center justify-between text-sm py-2 border-b border-slate-100 dark:border-slate-700 last:border-0"
+                className="text-sm py-2 border-b border-slate-100 dark:border-slate-700 last:border-0"
               >
-                <div className="flex items-center gap-2">
-                  <span className="text-red-500">●</span>
+                {/* 第一行：时间 */}
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-red-500 flex-shrink-0">●</span>
                   <span className="text-slate-600 dark:text-slate-400">
                     {formatDate(log.datetime)}
                   </span>
@@ -136,9 +141,16 @@ export function MonitorDetail({ monitor }: MonitorDetailProps) {
                     ({formatRelativeTime(log.datetime)})
                   </span>
                 </div>
-                <span className="text-slate-500 dark:text-slate-400">
+                {/* 第二行：持续时间 */}
+                <div className="ml-4 text-xs text-slate-500 dark:text-slate-400">
                   持续 {formatDuration(log.duration)}
-                </span>
+                </div>
+                {/* 第三行：原因 */}
+                {log.reason?.detail && (
+                  <p className="mt-1 ml-4 text-xs text-red-400">
+                    原因：{log.reason.detail}
+                  </p>
+                )}
               </div>
             ))}
           </div>

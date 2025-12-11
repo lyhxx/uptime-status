@@ -1,13 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { getConfig } from '../config';
+import { useAppStore } from '../store';
 import type { ProcessedMonitor } from '../types';
 
 export function useNotification(monitors: ProcessedMonitor[]) {
   const prevStatusRef = useRef<Map<number, string>>(new Map());
   const config = getConfig();
+  const notificationEnabled = useAppStore((s) => s.notificationEnabled);
 
   useEffect(() => {
     if (!('Notification' in window)) return;
+    if (!notificationEnabled) return;
 
     monitors.forEach((monitor) => {
       const prevStatus = prevStatusRef.current.get(monitor.id);
@@ -28,7 +31,7 @@ export function useNotification(monitors: ProcessedMonitor[]) {
 
       prevStatusRef.current.set(monitor.id, monitor.status);
     });
-  }, [monitors]);
+  }, [monitors, notificationEnabled]);
 
   // 更新页面标题
   useEffect(() => {

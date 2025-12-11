@@ -32,8 +32,10 @@ export function StatsOverview({ total, up, down, paused, avgUptime, isLoading }:
             ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' 
             : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
         }`}
+        role="status"
+        aria-live="polite"
       >
-        <span className={`text-2xl ${allOk ? 'animate-heartbeat' : ''}`}>
+        <span className={`text-2xl ${allOk ? 'animate-heartbeat' : ''}`} aria-hidden="true">
           {allOk ? '💚' : '🔴'}
         </span>
         <div>
@@ -69,12 +71,12 @@ function StatCard({
   color?: string;
 }) {
   return (
-    <div className="card p-4">
+    <div className="card p-4" role="group" aria-label={`${label}: ${value}`}>
       <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mb-1">
-        <span>{icon}</span>
+        <span aria-hidden="true">{icon}</span>
         <span>{label}</span>
       </div>
-      <p className={`text-2xl font-bold ${color}`}>{value}</p>
+      <p className={`text-2xl font-bold ${color}`} aria-hidden="true">{value}</p>
     </div>
   );
 }

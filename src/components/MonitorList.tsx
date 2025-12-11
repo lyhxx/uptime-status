@@ -30,14 +30,17 @@ export function MonitorList({ monitors, isLoading, showLink }: MonitorListProps)
   }
 
   return (
-    <div className="card overflow-hidden">
-      {monitors.map((monitor) => (
-        <MonitorCard 
-          key={monitor.id} 
-          monitor={monitor} 
-          showLink={showLink}
-        />
-      ))}
-    </div>
+    <section className="card overflow-hidden" aria-label="服务监控列表">
+      <ul role="list">
+        {monitors.map((monitor) => (
+          <li key={monitor.id}>
+            <MonitorCard 
+              monitor={monitor} 
+              showLink={showLink}
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

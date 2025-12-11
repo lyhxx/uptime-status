@@ -8,7 +8,7 @@ export function Footer() {
   if (embedMode) return null;
 
   return (
-    <footer className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+    <footer className="py-8 text-center text-sm text-slate-500 dark:text-slate-400" role="contentinfo">
       <p>
         基于{' '}
         <a
@@ -22,15 +22,24 @@ export function Footer() {
         {' '}接口，检测频率 {config.refetchInterval / 60} 分钟
       </p>
       <p className="mt-1">
-        &copy; {new Date().getFullYear()}{' '}
+        Powered by{' '}
         <a
           href="https://github.com/lyhxx/uptime-status"
           target="_blank"
           rel="noopener noreferrer"
           className="text-green-500 hover:underline"
         >
-          {config.siteName}
+          Uptime Status
         </a>
+      </p>
+      <p className="mt-3 flex items-center justify-center gap-4 text-xs">
+        <span>
+          今日访问 <span id="busuanzi_today_pv" className="text-green-500">-</span> 次
+        </span>
+        <span className="text-slate-300 dark:text-slate-600">|</span>
+        <span>
+          总访问 <span id="busuanzi_site_pv" className="text-green-500">-</span> 次
+        </span>
       </p>
     </footer>
   );
