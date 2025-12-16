@@ -1,8 +1,6 @@
 export interface AppConfig {
-  siteUrl: string;
   siteName: string;
   siteDescription: string;
-  siteKeywords: string;
   apiKeys: string[];
   apiUrl?: string;
   countDays: number;

@@ -1,24 +1,34 @@
-name: 部署状态监控面板
+# EdgeOne Pages 部署说明
+# 
+# EdgeOne Pages 推荐直接在控制台连接 GitHub 仓库，自动构建部署
+# 无需使用 GitHub Actions
+# 
+# 部署步骤：
+# 1. 访问 https://pages.edgeone.ai/
+# 2. 连接你的 GitHub 账号
+# 3. 选择本仓库
+# 4. 配置构建设置（已在 edgeone.json 中定义）
+# 5. 配置环境变量
+# 6. 开始部署
+#
+# 如果你需要使用 GitHub Actions 部署，请参考 EdgeOne 官方文档配置
+
+name: Build Test
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -31,22 +41,13 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          VITE_UPTIME_API_KEYS: ur3205001-05db75e224a0309f16fd982c
+          VITE_API_PROXY_URL: ''
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
         with:
+          name: dist
           path: dist
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          retention-days: 7

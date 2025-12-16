@@ -4,7 +4,7 @@
 
 A modern service status monitoring panel based on UptimeRobot API.
 
-Demo: https://lyhxx.github.io/uptime-status
+Demo: [EdgeOne Pages Deployment](https://pages.edgeone.ai/)
 
 ![Preview](docs/images/preview.png)
 
@@ -27,19 +27,54 @@ Demo: https://lyhxx.github.io/uptime-status
 
 ## Quick Start
 
-### GitHub Pages Deployment
+### EdgeOne Pages Deployment (Recommended)
 
-1. Fork this repository
-2. Modify `base` and `siteUrl` in `site.config.ts`
-3. Modify other settings in `src/config/config.ts`
-4. Push code, GitHub Actions will auto build and deploy
-5. Enable GitHub Pages in Settings → Pages, select "GitHub Actions" as source
+#### Method 1: One-Click Deploy
+
+[![Deploy to EdgeOne Pages](https://pages.edgeone.ai/deploy-button.svg)](https://pages.edgeone.ai/new?template=https://github.com/lyhxx/uptime-status)
+
+1. Click the button above
+2. Login/Register EdgeOne account
+3. Configure environment variables:
+   - `VITE_UPTIME_API_KEYS`: Your UptimeRobot API Keys (required)
+   - Other variables are optional
+4. Click deploy and wait for build
+5. Access your deployed site
+
+#### Method 2: Import from GitHub
+
+1. Visit [EdgeOne Pages](https://pages.edgeone.ai/)
+2. Connect your GitHub account
+3. Select this repository
+4. Configure build settings:
+   - Build command: `npm run build`
+   - Output directory: `dist`
+5. Configure environment variables
+6. Start deployment
+
+#### EdgeOne Edge Functions (API Proxy)
+
+EdgeOne automatically enables edge function API proxy after deployment:
+- Proxy path: `https://your-domain.com/api/uptimerobot/v2/getMonitors`
+- Automatically solves CORS issues
+- Faster access speed in China
+
+To use the proxy, set environment variable:
+```
+VITE_API_PROXY_URL=/api/uptimerobot/v2/getMonitors
+```
 
 ### Local Development
 
 ```bash
 # Install dependencies
 npm install
+
+# Copy environment variables config
+cp .env.example .env
+
+# Edit .env file, fill in your API Key
+# VITE_UPTIME_API_KEYS=your-api-key
 
 # Start dev server
 npm run dev
@@ -62,37 +97,46 @@ npm run build
 
 ## Configuration
 
-### Site Config (site.config.ts)
+### Environment Variables (Recommended)
 
-```typescript
-export default {
-  // Deployment path
-  // For GitHub Pages subdirectory, use repo name like '/uptime-status/'
-  // For custom domain or root path, use '/'
-  base: '/uptime-status/',
+Configure via environment variables for EdgeOne Pages deployment:
 
-  // Site URL (for SEO)
-  siteUrl: 'https://lyhxx.github.io/uptime-status',
-};
+```bash
+# .env file example (for local development)
+VITE_UPTIME_API_KEYS=your-api-key-1,your-api-key-2
+VITE_API_PROXY_URL=/api/uptimerobot/v2/getMonitors
+VITE_SITE_NAME=Service Status Monitor
+VITE_SITE_DESCRIPTION=Real-time service monitoring
 ```
+
+**Environment Variables**:
+
+| Variable | Description | Required | Example |
+|----------|-------------|----------|---------|
+| `VITE_UPTIME_API_KEYS` | UptimeRobot API Keys (comma-separated) | Yes | `ur123...,ur456...` |
+| `VITE_API_PROXY_URL` | API proxy URL | No | `/api/uptimerobot/v2/getMonitors` |
+| `VITE_SITE_NAME` | Site name | No | `Status Monitor` |
+| `VITE_SITE_DESCRIPTION` | Site description | No | `Real-time monitoring` |
 
 ### App Config (src/config/config.ts)
 
+For local development, you can modify this file directly. For production, use environment variables:
+
 ```typescript
 const config: AppConfig = {
-  // Site title
+  // Site title (supports VITE_SITE_NAME env var)
   siteName: 'Service Status Monitor',
 
-  // Site description (for SEO)
+  // Site description (supports VITE_SITE_DESCRIPTION env var)
   siteDescription: 'Real-time service status monitoring',
 
   // Site keywords (for SEO)
   siteKeywords: 'service monitor,status page,UptimeRobot,uptime',
 
-  // UptimeRobot API Keys
+  // UptimeRobot API Keys (supports VITE_UPTIME_API_KEYS env var)
   apiKeys: ['your-api-key'],
 
-  // Custom API proxy URL (optional, for CORS)
+  // API proxy URL (supports VITE_API_PROXY_URL env var)
   apiUrl: '',
 
   // Default days to display (30, 60, 90)
@@ -126,14 +170,30 @@ const config: AppConfig = {
 Add `?embed=1` parameter to URL for minimal embed mode:
 
 ```html
-<iframe src="https://lyhxx.github.io/uptime-status/?embed=1" width="100%" height="600"></iframe>
+<iframe src="https://your-domain.com/?embed=1" width="100%" height="600"></iframe>
 ```
 
 ## API Proxy
 
 Due to browser CORS restrictions, direct UptimeRobot API calls will fail. You need a proxy.
 
-### Nginx Proxy (Recommended)
+### EdgeOne Edge Functions (Recommended)
+
+EdgeOne Pages automatically includes edge function proxy:
+
+1. After deploying to EdgeOne Pages, edge functions work automatically
+2. Set environment variable `VITE_API_PROXY_URL` to `/api/uptimerobot/v2/getMonitors`
+3. Edge function code is located at `edgeone/functions/api/uptimerobot/[[path]].js`
+
+**Advantages**:
+- ✅ No additional server needed
+- ✅ Automatic CORS handling
+- ✅ Edge node acceleration
+- ✅ Same domain as static assets
+
+### Nginx Proxy
+
+If using your own server:
 
 ```nginx
 location /api/uptimerobot/ {
@@ -156,13 +216,7 @@ location /api/uptimerobot/ {
 
 ### Cloudflare Worker
 
-If you don't have a server, use Cloudflare Worker:
-
-1. Login to [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. Go to Workers & Pages → Create Worker
-3. Paste content from `worker/uptimerobot-proxy.js`
-4. Deploy and get Worker URL (e.g., `https://your-worker.workers.dev`)
-5. Set `apiUrl: 'https://your-worker.workers.dev/v2/getMonitors'` in config
+If using Cloudflare (see `worker/uptimerobot-proxy.js` for reference)
 
 ## Tech Stack
 
@@ -174,13 +228,13 @@ If you don't have a server, use Cloudflare Worker:
 - [Zustand](https://zustand-demo.pmnd.rs/) - State management
 - [Recharts](https://recharts.org/) - Charts
 
-## Custom Domain (Optional)
+## Custom Domain
 
-To use a custom domain:
+EdgeOne Pages supports custom domain binding:
 
-1. Add CNAME record pointing to `<username>.github.io`
-2. Set custom domain in Settings → Pages → Custom domain
-3. Change `base` to `/` and `siteUrl` to your domain in `site.config.ts`
+1. Bind your domain in EdgeOne console
+2. Configure DNS resolution (CNAME or A record)
+3. Access your site after DNS takes effect
 
 ## FAQ
 
@@ -206,7 +260,15 @@ A: Click the notification icon in toolbar to toggle. Settings are saved automati
 
 **Q: Page shows "Please configure API Key"?**
 
-A: Configure a valid UptimeRobot API Key in `src/config/config.ts`.
+A: For EdgeOne Pages deployment, configure `VITE_UPTIME_API_KEYS` in environment variables. For local development, configure in `src/config/config.ts`.
+
+**Q: EdgeOne Pages deployment failed?**
+
+A: Check if environment variables are correctly configured, especially `VITE_UPTIME_API_KEYS` must have a valid API Key.
+
+**Q: API proxy not working?**
+
+A: Ensure environment variable `VITE_API_PROXY_URL` is set to `/api/uptimerobot/v2/getMonitors`, EdgeOne will automatically use edge functions for proxy.
 
 ## License
 

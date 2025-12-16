@@ -5,36 +5,10 @@ import App from './App';
 import { getConfig } from './config';
 import './index.css';
 
-// 设置 SEO 信息
+// 设置页面标题和描述
 const config = getConfig();
 document.title = config.siteName;
 document.querySelector('meta[name="description"]')?.setAttribute('content', config.siteDescription);
-
-// 动态添加 keywords meta 标签
-const keywordsMeta = document.createElement('meta');
-keywordsMeta.name = 'keywords';
-keywordsMeta.content = config.siteKeywords;
-document.head.appendChild(keywordsMeta);
-
-// 添加 canonical URL
-const canonicalLink = document.createElement('link');
-canonicalLink.rel = 'canonical';
-canonicalLink.href = config.siteUrl;
-document.head.appendChild(canonicalLink);
-
-// 添加 Open Graph 标签
-const ogTags = [
-  { property: 'og:title', content: config.siteName },
-  { property: 'og:description', content: config.siteDescription },
-  { property: 'og:url', content: config.siteUrl },
-  { property: 'og:type', content: 'website' },
-];
-ogTags.forEach(tag => {
-  const meta = document.createElement('meta');
-  meta.setAttribute('property', tag.property);
-  meta.content = tag.content;
-  document.head.appendChild(meta);
-});
 
 const queryClient = new QueryClient({
   defaultOptions: {

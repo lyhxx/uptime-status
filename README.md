@@ -4,9 +4,17 @@
 
 基于 UptimeRobot API 的现代化服务状态监控面板。
 
-演示地址：https://lyhxx.github.io/uptime-status
+演示地址：[EdgeOne Pages 部署](https://pages.edgeone.ai/)
 
 ![预览图](docs/images/preview.png)
+
+## 快速部署
+
+[![Deploy to EdgeOne](https://pages.edgeone.ai/button.svg)](https://pages.edgeone.ai/new?template=https://github.com/lyhxx/uptime-status)
+
+点击上方按钮一键部署到 EdgeOne Pages，部署时需要配置：
+- `VITE_UPTIME_API_KEYS`: 你的 UptimeRobot API Key（必填）
+- 其他环境变量可选，使用默认值即可
 
 ## 特性
 
@@ -27,19 +35,52 @@
 
 ## 快速开始
 
-### GitHub Pages 部署
+### EdgeOne Pages 部署（推荐）
 
-1. Fork 本项目
-2. 修改 `site.config.ts` 中的 `base` 和 `siteUrl`
-3. 修改 `src/config/config.ts` 中的其他配置
-4. 推送代码，GitHub Actions 会自动构建部署
-5. 在仓库 Settings → Pages 中启用 GitHub Pages，Source 选择 "GitHub Actions"
+#### 方式一：一键部署
+
+1. 点击上方 "Deploy to EdgeOne" 按钮
+2. 登录/注册 EdgeOne 账号
+3. 配置环境变量：
+   - `VITE_UPTIME_API_KEYS`: 填入你的 UptimeRobot API Key（[获取地址](https://uptimerobot.com/dashboard#mySettings)）
+   - 其他变量使用默认值即可
+4. 点击部署，等待构建完成
+5. 访问分配的域名即可使用
+
+#### 方式二：从 GitHub 导入
+
+1. 访问 [EdgeOne Pages](https://pages.edgeone.ai/)
+2. 连接你的 GitHub 账号
+3. 选择本仓库
+4. 配置构建设置：
+   - 构建命令: `npm run build`
+   - 输出目录: `dist`
+5. 配置环境变量（同上）
+6. 开始部署
+
+#### EdgeOne 边缘函数（API 代理）
+
+EdgeOne 部署后自动启用边缘函数 API 代理，无需额外配置：
+- 代理路径: `https://your-domain.com/api/uptimerobot/v2/getMonitors`
+- 自动解决跨域问题
+- 国内访问速度更快
+
+如需使用代理，在部署时设置环境变量：
+```
+VITE_API_PROXY_URL=/api/uptimerobot/v2/getMonitors
+```
 
 ### 本地开发
 
 ```bash
 # 安装依赖
 npm install
+
+# 复制环境变量配置文件
+cp .env.example .env
+
+# 编辑 .env 文件，填入你的 API Key
+# VITE_UPTIME_API_KEYS=your-api-key
 
 # 启动开发服务器
 npm run dev
@@ -59,39 +100,59 @@ npm run build
 
 > 注意：请使用 Read-only API Key，不要使用 Main API Key，避免泄露后被恶意操作。
 
+## 环境变量配置
+
+EdgeOne Pages 部署时通过环境变量配置，本地开发可创建 `.env` 文件：
+
+```bash
+# 复制示例文件
+cp .env.example .env
+
+# 编辑 .env 文件，填入你的配置
+```
+
+**环境变量说明**：
+
+| 变量名 | 说明 | 必填 | 示例 |
+|--------|------|------|------|
+| `VITE_UPTIME_API_KEYS` | UptimeRobot API Keys，多个用逗号分隔 | 是 | `ur123...,ur456...` |
+| `VITE_API_PROXY_URL` | API 代理地址 | 否 | `/api/uptimerobot/v2/getMonitors` |
+| `VITE_SITE_NAME` | 网站名称 | 否 | `服务状态监控` |
+| `VITE_SITE_DESCRIPTION` | 网站描述 | 否 | `实时监控服务状态` |
+
 ## 配置说明
 
-### 站点配置 (site.config.ts)
+### 环境变量配置（推荐）
 
-```typescript
-export default {
-  // 网站部署路径
-  // GitHub Pages 子路径部署时填仓库名，如 '/uptime-status/'
-  // 使用自定义域名或根路径部署时填 '/'
-  base: '/uptime-status/',
+EdgeOne Pages 部署时通过环境变量配置，无需修改代码：
 
-  // 网站地址（用于 SEO）
-  siteUrl: 'https://lyhxx.github.io/uptime-status',
-};
+```bash
+# .env 文件示例（本地开发用）
+VITE_UPTIME_API_KEYS=your-api-key-1,your-api-key-2
+VITE_API_PROXY_URL=/api/uptimerobot/v2/getMonitors
+VITE_SITE_NAME=服务状态监控面板
+VITE_SITE_DESCRIPTION=实时监控服务运行状态
 ```
 
 ### 应用配置 (src/config/config.ts)
 
+本地开发时可直接修改此文件，生产环境建议使用环境变量：
+
 ```typescript
 const config: AppConfig = {
-  // 网站标题
+  // 网站标题（支持环境变量 VITE_SITE_NAME）
   siteName: '服务状态监控面板',
 
-  // 网站描述（用于 SEO）
+  // 网站描述（支持环境变量 VITE_SITE_DESCRIPTION）
   siteDescription: '实时监控服务运行状态，查看历史可用性数据',
 
   // 网站关键词（用于 SEO）
   siteKeywords: '服务监控,状态页面,UptimeRobot,可用性监控',
 
-  // UptimeRobot API Keys
+  // UptimeRobot API Keys（支持环境变量 VITE_UPTIME_API_KEYS）
   apiKeys: ['your-api-key'],
 
-  // 自定义 API 代理地址（可选，用于解决跨域问题）
+  // API 代理地址（支持环境变量 VITE_API_PROXY_URL）
   apiUrl: '',
 
   // 默认显示天数 (30, 60, 90)
@@ -125,14 +186,30 @@ const config: AppConfig = {
 在 URL 后添加 `?embed=1` 参数可启用精简嵌入模式：
 
 ```html
-<iframe src="https://lyhxx.github.io/uptime-status/?embed=1" width="100%" height="600"></iframe>
+<iframe src="https://your-domain.com/?embed=1" width="100%" height="600"></iframe>
 ```
 
 ## API 代理
 
 由于浏览器跨域限制，直接调用 UptimeRobot API 会失败，需要通过代理转发请求。
 
-### Nginx 代理（推荐）
+### EdgeOne 边缘函数（推荐）
+
+EdgeOne Pages 部署时自动包含边缘函数代理，无需额外配置：
+
+1. 部署到 EdgeOne Pages 后，边缘函数自动生效
+2. 设置环境变量 `VITE_API_PROXY_URL` 为 `/api/uptimerobot/v2/getMonitors`
+3. 边缘函数代码位于 `edgeone/functions/api/uptimerobot/[[path]].js`
+
+**优势**：
+- ✅ 无需额外服务器
+- ✅ 自动处理 CORS
+- ✅ 边缘节点加速
+- ✅ 与静态资源同域名
+
+### Nginx 代理
+
+如果使用自己的服务器：
 
 ```nginx
 # UptimeRobot API 代理
@@ -158,13 +235,13 @@ location /api/uptimerobot/ {
 
 ### Cloudflare Worker
 
-如果没有自己的服务器，可以使用 Cloudflare Worker：
+如果使用 Cloudflare：
 
 1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
 2. 进入 Workers & Pages → Create Worker
 3. 将 `worker/uptimerobot-proxy.js` 的内容粘贴进去
 4. 部署后获得 Worker URL（如 `https://your-worker.workers.dev`）
-5. 在配置文件中设置 `apiUrl: 'https://your-worker.workers.dev/v2/getMonitors'`
+5. 设置环境变量 `VITE_API_PROXY_URL` 为 `https://your-worker.workers.dev/v2/getMonitors`
 
 ## 技术栈
 
@@ -176,13 +253,13 @@ location /api/uptimerobot/ {
 - [Zustand](https://zustand-demo.pmnd.rs/) - 状态管理
 - [Recharts](https://recharts.org/) - 图表库
 
-## 自定义域名（可选）
+## 自定义域名
 
-如果想使用自定义域名访问：
+EdgeOne Pages 支持绑定自定义域名：
 
-1. 在 DNS 添加 CNAME 记录，指向 `<username>.github.io`
-2. 在仓库 Settings → Pages → Custom domain 填入你的域名
-3. 修改 `site.config.ts` 中的 `base` 为 `/`，`siteUrl` 为你的域名
+1. 在 EdgeOne 控制台绑定你的域名
+2. 配置 DNS 解析（CNAME 或 A 记录）
+3. 域名生效后即可访问
 
 ## 常见问题
 
@@ -208,7 +285,15 @@ A: 点击工具栏的通知图标即可切换开关状态，设置会自动保�
 
 **Q: 页面显示"请配置 API Key"？**
 
-A: 需要在 `src/config/config.ts` 中配置有效的 UptimeRobot API Key。
+A: EdgeOne Pages 部署时需要在环境变量中配置 `VITE_UPTIME_API_KEYS`。本地开发时可在 `src/config/config.ts` 中配置。
+
+**Q: EdgeOne Pages 部署失败？**
+
+A: 检查环境变量是否正确配置，特别是 `VITE_UPTIME_API_KEYS` 必须填写有效的 API Key。
+
+**Q: API 代理不工作？**
+
+A: 确保环境变量 `VITE_API_PROXY_URL` 设置为 `/api/uptimerobot/v2/getMonitors`，EdgeOne 会自动使用边缘函数代理。
 
 ## License
 

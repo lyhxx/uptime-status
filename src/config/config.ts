@@ -1,33 +1,53 @@
 import type { AppConfig } from './types';
-import siteConfig from '../../site.config';
+
+/**
+ * 从环境变量读取配置
+ * EdgeOne Pages 部署时通过环境变量配置
+ */
+function getApiKeys(): string[] {
+  // 优先使用环境变量
+  const envKeys = import.meta.env.VITE_UPTIME_API_KEYS;
+  if (envKeys) {
+    return envKeys.split(',').map((k: string) => k.trim()).filter(Boolean);
+  }
+  // 开发环境默认值（示例 Key）
+  return ['ur3205001-05db75e224a0309f16fd982c'];
+}
+
+function getApiUrl(): string {
+  return import.meta.env.VITE_API_PROXY_URL || '';
+}
+
+function getSiteName(): string {
+  return import.meta.env.VITE_SITE_NAME || '服务状态监控面板';
+}
+
+function getSiteDescription(): string {
+  return import.meta.env.VITE_SITE_DESCRIPTION || '实时监控服务运行状态，查看历史可用性数据';
+}
 
 /**
  * 应用配置文件
- * 修改此文件后需要重新构建
+ * EdgeOne Pages 部署时通过环境变量配置
+ * 本地开发时可直接修改此文件
  */
 const config: AppConfig = {
   // ===== 基础配置 =====
 
-  // 网站地址（用于 SEO，从 site.config.ts 读取）
-  siteUrl: siteConfig.siteUrl,
+  // 网站标题（支持环境变量）
+  siteName: getSiteName(),
 
-  // 网站标题
-  siteName: '服务状态监控面板',
+  // 网站描述（支持环境变量）
+  siteDescription: getSiteDescription(),
 
-  // 网站描述（用于 SEO）
-  siteDescription: '实时监控服务运行状态，查看历史可用性数据',
-
-  // 网站关键词（用于 SEO）
-  siteKeywords: '服务监控,状态页面,UptimeRobot,可用性监控',
-
-  // UptimeRobot API Keys
+  // UptimeRobot API Keys（支持环境变量）
   // 支持 Monitor-Specific 和 Read-Only API Key
   // 可以配置多个 key，会合并显示所有监控项
-  apiKeys: ['ur3205001-05db75e224a0309f16fd982c'],
+  apiKeys: getApiKeys(),
 
-  // 自定义 API 代理地址（可选，用于解决跨域问题）
+  // 自定义 API 代理地址（支持环境变量）
   // 留空则使用官方 API: https://api.uptimerobot.com/v2/getMonitors
-  apiUrl: 'https://javai.cn/api/uptimerobot/v2/getMonitors',
+  apiUrl: getApiUrl(),
 
   // ===== 显示配置 =====
 
