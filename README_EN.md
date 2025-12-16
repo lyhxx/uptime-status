@@ -29,23 +29,30 @@ Demo: [EdgeOne Pages Deployment](https://edgeone.ai)
 
 ### EdgeOne Pages Deployment (Recommended)
 
-1. Visit [EdgeOne Pages](https://edgeone.ai)
-2. Connect your GitHub account
-3. Select this repository
-4. Configure build settings:
-   - Build command: `npm run build`
-   - Output directory: `dist`
-5. Configure environment variables
-6. Start deployment
+1. Visit [EdgeOne Pages](https://edgeone.ai), login/register account
+2. Go to EdgeOne Pages console, click "New Site"
+3. Select "Import from Git", connect your GitHub account
+4. Select this repository `uptime-status`
+5. Configure build settings:
+   - **Build command**: `npm run build`
+   - **Output directory**: `dist`
+   - **Node version**: 18.x or higher
+6. Configure environment variables:
+   - `VITE_UPTIME_API_KEYS`: Your UptimeRobot API Key (required, [Get it here](https://uptimerobot.com/dashboard#mySettings))
+   - `VITE_API_PROXY_URL`: `/api/uptimerobot/v2/getMonitors` (recommended, use edge function for faster access)
+   - `VITE_SITE_NAME`: Site name (optional)
+   - `VITE_SITE_DESCRIPTION`: Site description (optional)
+7. Click "Deploy" and wait for build to complete
+8. Access your deployed site via the assigned domain
 
-#### EdgeOne Edge Functions (API Proxy)
+#### EdgeOne Edge Functions (API Acceleration)
 
-EdgeOne automatically enables edge function API proxy after deployment:
+EdgeOne automatically enables edge functions to accelerate API access via edge nodes:
 - Proxy path: `https://your-domain.com/api/uptimerobot/v2/getMonitors`
-- Automatically solves CORS issues
-- Faster access speed in China
+- Edge node acceleration for faster access
+- Automatic CORS handling
 
-To use the proxy, set environment variable:
+Set environment variable during deployment:
 ```
 VITE_API_PROXY_URL=/api/uptimerobot/v2/getMonitors
 ```
@@ -95,19 +102,7 @@ Add `?embed=1` parameter to URL for minimal embed mode:
 
 Due to browser CORS restrictions, direct UptimeRobot API calls will fail. You need a proxy.
 
-### EdgeOne Edge Functions (Recommended)
-
-EdgeOne Pages automatically includes edge function proxy:
-
-1. After deploying to EdgeOne Pages, edge functions work automatically
-2. Set environment variable `VITE_API_PROXY_URL` to `/api/uptimerobot/v2/getMonitors`
-3. Edge function code is located at `edgeone/functions/api/uptimerobot/[[path]].js`
-
-**Advantages**:
-- ✅ No additional server needed
-- ✅ Automatic CORS handling
-- ✅ Edge node acceleration
-- ✅ Same domain as static assets
+> **Note**: If deployed on EdgeOne Pages, edge functions are automatically configured. Just set environment variable `VITE_API_PROXY_URL=/api/uptimerobot/v2/getMonitors` to use edge acceleration, no need to manually configure the following proxies.
 
 ### Nginx Proxy
 

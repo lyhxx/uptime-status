@@ -29,23 +29,30 @@
 
 ### EdgeOne Pages 部署（推荐）
 
-1. 访问 [EdgeOne Pages](https://cloud.tencent.com/product/teo)
-2. 连接你的 GitHub 账号
-3. 选择本仓库
-4. 配置构建设置：
-   - 构建命令: `npm run build`
-   - 输出目录: `dist`
-5. 配置环境变量（同上）
-6. 开始部署
+1. 访问 [EdgeOne Pages](https://cloud.tencent.com/product/teo)，登录/注册腾讯云账号
+2. 进入 EdgeOne Pages 控制台，点击"新建站点"
+3. 选择"从 Git 导入"，连接你的 GitHub 账号
+4. 选择本仓库 `uptime-status`
+5. 配置构建设置：
+   - **构建命令**: `npm run build`
+   - **输出目录**: `dist`
+   - **Node 版本**: 18.x 或更高
+6. 配置环境变量：
+   - `VITE_UPTIME_API_KEYS`: 你的 UptimeRobot API Key（必填，[获取地址](https://uptimerobot.com/dashboard#mySettings)）
+   - `VITE_API_PROXY_URL`: `/api/uptimerobot/v2/getMonitors`（推荐，使用边缘函数加速访问）
+   - `VITE_SITE_NAME`: 网站名称（可选）
+   - `VITE_SITE_DESCRIPTION`: 网站描述（可选）
+7. 点击"部署"，等待构建完成
+8. 访问分配的域名即可使用
 
-#### EdgeOne 边缘函数（API 代理）
+#### EdgeOne 边缘函数（API 加速）
 
-EdgeOne 部署后自动启用边缘函数 API 代理，无需额外配置：
+EdgeOne 部署后自动启用边缘函数，通过边缘节点加速 API 访问：
 - 代理路径: `https://your-domain.com/api/uptimerobot/v2/getMonitors`
-- 自动解决跨域问题
-- 国内访问速度更快
+- 边缘节点加速，国内访问更快
+- 自动处理 CORS
 
-如需使用代理，在部署时设置环境变量：
+部署时设置环境变量：
 ```
 VITE_API_PROXY_URL=/api/uptimerobot/v2/getMonitors
 ```
@@ -114,19 +121,7 @@ cp .env.example .env
 
 由于浏览器跨域限制，直接调用 UptimeRobot API 会失败，需要通过代理转发请求。
 
-### EdgeOne 边缘函数（推荐）
-
-EdgeOne Pages 部署时自动包含边缘函数代理，无需额外配置：
-
-1. 部署到 EdgeOne Pages 后，边缘函数自动生效
-2. 设置环境变量 `VITE_API_PROXY_URL` 为 `/api/uptimerobot/v2/getMonitors`
-3. 边缘函数代码位于 `edgeone/functions/api/uptimerobot/[[path]].js`
-
-**优势**：
-- ✅ 无需额外服务器
-- ✅ 自动处理 CORS
-- ✅ 边缘节点加速
-- ✅ 与静态资源同域名
+> **注意**：如果使用 EdgeOne Pages 部署，边缘函数已自动配置，只需设置环境变量 `VITE_API_PROXY_URL=/api/uptimerobot/v2/getMonitors` 即可使用边缘加速，无需手动配置以下代理。
 
 ### Nginx 代理
 
